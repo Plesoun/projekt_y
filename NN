@@ -1,0 +1,70 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Feb  8 08:25:54 2018
+
+@author: schiejak
+"""
+
+
+from __future__ import division, print_function, absolute_import 
+import tflearn 
+from tflearn.layers.core import input_data, dropout, fully_connected 
+from tflearn.layers.conv import conv_2d, max_pool_2d
+from tflearn.layers.estimator import regression
+from tflearn.data_utils import image_preloader
+import numpy as np
+import tensorflow as tf
+
+
+
+cesta_k_datum = 'G:\\Projekt_Y\\processed\\'
+
+
+X, Y = image_preloader(cesta_k_datum, image_shape=(160, 160), mode='folder', 
+                       files_extension='.png') 
+
+X = np.reshape(X, (-1, 160, 160,1))
+
+tf.reset_default_graph()
+
+
+sit = input_data(shape=[None, 160, 160, 1])
+
+sit = conv_2d(sit, 64, 3, activation='relu') 
+sit = conv_2d(sit, 64, 3, activation='relu') 
+sit = max_pool_2d(sit, 2, strides=2)
+
+sit = conv_2d(sit, 128, 3, activation='relu') 
+sit = conv_2d(sit, 128, 3, activation='relu') 
+sit = max_pool_2d(sit, 2, strides=2) 
+
+sit = conv_2d(sit, 256, 3, activation='relu') 
+sit = conv_2d(sit, 256, 3, activation='relu') 
+sit = max_pool_2d(sit, 2, strides=2) 
+
+sit = conv_2d(sit, 512, 3, activation='relu') 
+sit = conv_2d(sit, 512, 3, activation='relu') 
+sit = max_pool_2d(sit, 2, strides=2) 
+
+sit = conv_2d(sit, 512, 3, activation='relu') 
+sit = conv_2d(sit, 512, 3, activation='relu') 
+sit = max_pool_2d(sit, 2, strides=2) 
+
+ 
+sit = fully_connected(sit, 1024, activation='relu') 
+sit = dropout(sit, 0.8) 
+sit = fully_connected(sit, 2, activation='softmax') 
+
+
+sit = regression(sit, optimizer='adam', 
+                     loss='categorical_crossentropy', 
+                     learning_rate=0.0001) 
+
+# Training 
+model = tflearn.DNN(sit, checkpoint_path='model_proj_Y', 
+                    max_checkpoints=1, tensorboard_verbose=0) 
+
+
+model.fit(X, Y, n_epoch=30, validation_set = 0.1, shuffle=True, 
+          show_metric=True, batch_size=8, snapshot_step=20, 
+          snapshot_epoch=False, run_id='projekt_Y')  
