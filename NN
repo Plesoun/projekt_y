@@ -17,14 +17,16 @@ import tensorflow as tf
 
 
 
-cesta_k_datum = 'G:\\Projekt_Y\\processed\\'
+cesta_k_datum = ''
 
+#Loading images
 
 X, Y = image_preloader(cesta_k_datum, image_shape=(160, 160), mode='folder', 
                        files_extension='.png') 
 
 X = np.reshape(X, (-1, 160, 160,1))
 
+#Defining neural network
 tf.reset_default_graph()
 
 
